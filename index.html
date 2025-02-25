@@ -39,7 +39,7 @@
       border-radius: 10px;
       border: 2px solid #ffaa00;
     }
-    select, input, button {
+    select, button {
       padding: 10px;
       border: 1px solid #ffaa00;
       border-radius: 6px;
@@ -83,9 +83,6 @@
       height: 50px;
       object-fit: contain;
     }
-    .btn-modifier { background: #33cc33; color: #fff; padding: 5px; }
-    .btn-supprimer { background: #cc3333; color: #fff; padding: 5px; }
-    .btn-accoupler { background: #8e44ad; color: #fff; padding: 5px; }
   </style>
 </head>
 <body>
@@ -107,7 +104,7 @@
   <h2>Liste des Dragodindes</h2>
   <table>
     <thead>
-      <tr><th>Image</th><th>Nom</th><th>Genre</th><th>Couleur</th><th>Gén.</th><th>Actions</th></tr>
+      <tr><th>Image</th><th>Nom</th><th>Genre</th><th>Couleur</th><th>Génération</th><th>Actions</th></tr>
     </thead>
     <tbody id="listBody"></tbody>
   </table>
@@ -147,32 +144,14 @@ document.getElementById("gn").onclick = () => {
 function renderList() {
     document.getElementById("listBody").innerHTML = d.map((o, index) => `
         <tr>
-            <td><img src="img/${o.col.toLowerCase()}.png" class="dragodinde-img" alt="${o.col}"></td>
+            <td><img src="img/dragodinde_${o.col.toLowerCase()}.webp" class="dragodinde-img" alt="${o.col}"></td>
             <td>${o.nom}</td>
             <td>${o.sexe}</td>
             <td>${o.col}</td>
             <td>${o.gen}</td>
-            <td>
-                <button class="btn-supprimer" onclick="remove(${index})">Supprimer</button>
-            </td>
+            <td><button onclick="remove(${index})">Supprimer</button></td>
         </tr>
     `).join("");
-}
-
-function generatePairs() {
-    let males = d.filter(dd => dd.sexe === "M");
-    let femelles = d.filter(dd => dd.sexe === "F");
-    let pairs = [];
-    
-    males.forEach(m => {
-        femelles.forEach(f => {
-            if (m.gen === f.gen && m.col !== f.col) {
-                pairs.push(`<p>${m.nom} (M) & ${f.nom} (F) ➝ Couleurs possibles: ${m.col} / ${f.col} <button class='btn-accoupler'>Accoupler</button></p>`);
-            }
-        });
-    });
-    
-    document.getElementById("accouplement-list").innerHTML = pairs.join("");
 }
 
 function remove(index) {
