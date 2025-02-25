@@ -8,30 +8,30 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Roboto', sans-serif;
-      background: #222;
+      background: #1e1e1e;
       color: #ddd;
       padding: 20px;
       display: flex;
       justify-content: center;
     }
     .container {
-      background: rgba(51, 51, 51, 0.9);
-      max-width: 900px;
+      background: rgba(51, 51, 51, 0.95);
+      max-width: 1000px;
       width: 100%;
       padding: 20px;
       border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.7);
     }
-    h1 { text-align: center; font-size: 2.5em; color: #fff; }
+    h1 { text-align: center; font-size: 2.5em; color: #fff; margin-bottom: 20px; }
     form {
       display: flex;
       flex-wrap: wrap;
-      gap: 16px;
+      gap: 12px;
       margin-bottom: 20px;
-      background: rgba(34,34,34,0.7);
+      background: rgba(34,34,34,0.8);
       padding: 15px;
       border-radius: 6px;
-      border: 1px solid #444;
+      border: 1px solid #555;
     }
     select, input, button {
       padding: 8px;
@@ -39,14 +39,17 @@
       border-radius: 4px;
       background: #444;
       color: #ddd;
+      font-size: 1rem;
     }
     button {
       cursor: pointer;
       background: #3498db;
       color: #fff;
       border: none;
+      font-weight: bold;
+      transition: 0.3s;
     }
-    button:hover { background: #2980b9; }
+    button:hover { background: #2980b9; transform: scale(1.05); }
     table {
       width: 100%;
       border-collapse: collapse;
@@ -54,7 +57,7 @@
     }
     th, td {
       border: 1px solid #555;
-      padding: 10px;
+      padding: 12px;
       text-align: left;
     }
     th {
@@ -66,6 +69,7 @@
     .btn-modifier:hover { background: #d4ac0d; }
     .btn-supprimer { background: #e74c3c; }
     .btn-supprimer:hover { background: #c0392b; }
+    .btn-proposer { background: #8e44ad; font-size: 1rem; padding: 10px; }
   </style>
 </head>
 <body>
@@ -81,6 +85,9 @@
     </select>
     <select id="col"></select>
     <select id="gen"></select>
+    <select id="pere"><option value="">(Père)</option></select>
+    <select id="mere"><option value="">(Mère)</option></select>
+    <select id="fec"><option value="Non">Non</option><option value="Oui">Oui</option></select>
     <input type="text" id="nom" placeholder="Nom (lettres/chiffres)" />
     <button type="button" id="gn">Générer Nom</button>
     <button type="submit">Créer</button>
@@ -89,14 +96,17 @@
   <h2>Liste des Dragodindes</h2>
   <table>
     <thead>
-      <tr><th>Nom</th><th>Genre</th><th>Couleur</th><th>Gén.</th><th>Actions</th></tr>
+      <tr><th>Nom</th><th>Genre</th><th>Couleur</th><th>Gén.</th><th>Père</th><th>Mère</th><th>Féconde</th><th>Actions</th></tr>
     </thead>
     <tbody id="listBody"></tbody>
   </table>
 </div>
 
 <script>
-const allColors = ["Amande", "Rousse", "Dorée", "Indigo", "Orchidée", "Ébène", "Pourpre", "Émeraude", "Ivoire", "Turquoise", "Caméléon"];
+const allColors = [
+  "Amande", "Rousse", "Dorée", "Indigo", "Orchidée", "Ebène", "Pourpre", "Emeraude", "Ivoire", "Turquoise", "Caméléon",
+  "Prune", "Saphir", "Rubis", "Onyx", "Argentée", "Dorée-Rousse", "Ebène-Ivoire", "Pourpre-Indigo", "Saphir-Turquoise", "Prune-Orchidée"
+];
 const allGens = Array.from({ length: 11 }, (_, i) => `G${i}`);
 
 function fillSelect(id, arr) {
@@ -112,9 +122,12 @@ document.getElementById("createForm").onsubmit = e => {
     const sexe = document.getElementById("sexe").value;
     const col = document.getElementById("col").value;
     const gen = document.getElementById("gen").value;
+    const pere = document.getElementById("pere").value;
+    const mere = document.getElementById("mere").value;
+    const fec = document.getElementById("fec").value;
     const nom = document.getElementById("nom").value.trim();
     if (!sexe || !col || !gen || !nom.match(/^[a-zA-Z0-9]+$/)) return alert("Champs invalides !");
-    d.push({ id: d.length + 1, sexe, col, gen, nom });
+    d.push({ id: d.length + 1, sexe, col, gen, pere, mere, fec, nom });
     renderList();
     e.target.reset();
 };
@@ -126,6 +139,9 @@ function renderList() {
             <td>${o.sexe === "M" ? "Mâle" : "Femelle"}</td>
             <td>${o.col}</td>
             <td>${o.gen}</td>
+            <td>${o.pere || "-"}</td>
+            <td>${o.mere || "-"}</td>
+            <td>${o.fec}</td>
             <td>
                 <button class="btn-modifier" onclick="edit(${o.id})">Modifier</button>
                 <button class="btn-supprimer" onclick="remove(${o.id})">X</button>
@@ -133,22 +149,6 @@ function renderList() {
         </tr>
     `).join("");
 }
-
-function remove(id) {
-    if (confirm("Supprimer cette dragodinde ?")) {
-        d = d.filter(o => o.id !== id);
-        renderList();
-    }
-}
-
-document.getElementById("gn").onclick = () => {
-    const col = document.getElementById("col").value[0] || "X";
-    const gen = document.getElementById("gen").value || "G?";
-    const rnd = Math.floor(Math.random() * 10000);
-    const name = col + gen + rnd;
-    document.getElementById("nom").value = name;
-    navigator.clipboard.writeText(name);
-};
 </script>
 
 </body>
