@@ -83,6 +83,9 @@
       height: 50px;
       object-fit: contain;
     }
+    .btn-modifier { background: #33cc33; color: #fff; padding: 5px; }
+    .btn-supprimer { background: #cc3333; color: #fff; padding: 5px; }
+    .btn-accoupler { background: #8e44ad; color: #fff; padding: 5px; }
   </style>
 </head>
 <body>
@@ -104,10 +107,13 @@
   <h2>Liste des Dragodindes</h2>
   <table>
     <thead>
-      <tr><th>Image</th><th>Nom</th><th>Genre</th><th>Couleur</th><th>Gén.</th></tr>
+      <tr><th>Image</th><th>Nom</th><th>Genre</th><th>Couleur</th><th>Gén.</th><th>Actions</th></tr>
     </thead>
     <tbody id="listBody"></tbody>
   </table>
+
+  <h2>Suggestions d'Accouplement</h2>
+  <div id="accouplement-list"></div>
 </div>
 
 <script>
@@ -135,18 +141,44 @@ document.getElementById("gn").onclick = () => {
     navigator.clipboard.writeText(nom);
     d.push({ sexe, col, gen, nom });
     renderList();
+    generatePairs();
 };
 
 function renderList() {
-    document.getElementById("listBody").innerHTML = d.map(o => `
+    document.getElementById("listBody").innerHTML = d.map((o, index) => `
         <tr>
             <td><img src="img/${o.col.toLowerCase()}.png" class="dragodinde-img" alt="${o.col}"></td>
             <td>${o.nom}</td>
             <td>${o.sexe}</td>
             <td>${o.col}</td>
             <td>${o.gen}</td>
+            <td>
+                <button class="btn-supprimer" onclick="remove(${index})">Supprimer</button>
+            </td>
         </tr>
     `).join("");
+}
+
+function generatePairs() {
+    let males = d.filter(dd => dd.sexe === "M");
+    let femelles = d.filter(dd => dd.sexe === "F");
+    let pairs = [];
+    
+    males.forEach(m => {
+        femelles.forEach(f => {
+            if (m.gen === f.gen && m.col !== f.col) {
+                pairs.push(`<p>${m.nom} (M) & ${f.nom} (F) ➝ Couleurs possibles: ${m.col} / ${f.col} <button class='btn-accoupler'>Accoupler</button></p>`);
+            }
+        });
+    });
+    
+    document.getElementById("accouplement-list").innerHTML = pairs.join("");
+}
+
+function remove(index) {
+    d.splice(index, 1);
+    renderList();
+    generatePairs();
 }
 </script>
 
