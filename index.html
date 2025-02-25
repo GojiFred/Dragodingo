@@ -1,28 +1,29 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8">
   <title>Dragodingo</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Roboto', sans-serif;
-      background: url("https://via.placeholder.com/1600x900/222/666?text=Arriere-plan+Dragodingo") no-repeat center center fixed;
-      background-size: cover;
+      background: #222;
       color: #ddd;
       padding: 20px;
+      display: flex;
+      justify-content: center;
     }
     .container {
       background: rgba(51, 51, 51, 0.9);
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 20px 30px;
+      max-width: 900px;
+      width: 100%;
+      padding: 20px;
       border-radius: 10px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.6);
     }
-    h1 { text-align: center; font-size: 2.5em; font-weight: bold; color: #fff; }
-    form, .edit-form {
+    h1 { text-align: center; font-size: 2.5em; color: #fff; }
+    form {
       display: flex;
       flex-wrap: wrap;
       gap: 16px;
@@ -33,36 +34,38 @@
       border: 1px solid #444;
     }
     select, input, button {
-      padding: 6px 10px;
+      padding: 8px;
       border: 1px solid #666;
       border-radius: 4px;
       background: #444;
       color: #ddd;
-      outline: none;
     }
     button {
       cursor: pointer;
       background: #3498db;
       color: #fff;
       border: none;
-      transition: background 0.3s, transform 0.3s;
     }
-    button:hover { background: #2980b9; transform: scale(1.05); }
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { border: 1px solid #555; padding: 10px; text-align: left; }
-    th { background: #3498db; cursor: pointer; }
-    th:hover { background: #2980b9; }
-    tr:nth-child(even) td { background: rgba(60,60,60, 0.3); }
-    tr:nth-child(odd) td { background: rgba(60,60,60, 0.15); }
+    button:hover { background: #2980b9; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #555;
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background: #3498db;
+      cursor: pointer;
+      color: white;
+    }
     .btn-modifier { background: #f1c40f; color: #111; }
     .btn-modifier:hover { background: #d4ac0d; }
     .btn-supprimer { background: #e74c3c; }
     .btn-supprimer:hover { background: #c0392b; }
-    .btn-proposer { background: #8e44ad; margin-top: 10px; }
-    .btn-proposer:hover { background: #71368a; }
-    #pairs-text { padding: 15px; background: rgba(34,34,34,0.7); border: 1px solid #444; }
-    .edit-form { display: none; }
-    .visible { display: flex !important; }
   </style>
 </head>
 <body>
@@ -71,10 +74,13 @@
   <h1>Dragodingo</h1>
 
   <form id="createForm">
-    <select id="sexe"><option value="">(Genre)</option><option value="M">Mâle</option><option value="F">Femelle</option></select>
+    <select id="sexe">
+      <option value="">(Genre)</option>
+      <option value="M">Mâle</option>
+      <option value="F">Femelle</option>
+    </select>
     <select id="col"></select>
     <select id="gen"></select>
-    <select id="acc"></select>
     <input type="text" id="nom" placeholder="Nom (lettres/chiffres)" />
     <button type="button" id="gn">Générer Nom</button>
     <button type="submit">Créer</button>
@@ -82,26 +88,22 @@
 
   <h2>Liste des Dragodindes</h2>
   <table>
-    <thead><tr><th data-col="nom">Nom</th><th data-col="sexe">Genre</th><th data-col="col">Couleur</th><th data-col="gen">Gén.</th><th>Actions</th></tr></thead>
+    <thead>
+      <tr><th>Nom</th><th>Genre</th><th>Couleur</th><th>Gén.</th><th>Actions</th></tr>
+    </thead>
     <tbody id="listBody"></tbody>
   </table>
-
-  <h2>Propositions de Croisements</h2>
-  <button class="btn-proposer" id="calc-pairs">Proposer des croisements</button>
-  <div id="pairs-text"></div>
 </div>
 
 <script>
 const allColors = ["Amande", "Rousse", "Dorée", "Indigo", "Orchidée", "Ébène", "Pourpre", "Émeraude", "Ivoire", "Turquoise", "Caméléon"];
 const allGens = Array.from({ length: 11 }, (_, i) => `G${i}`);
-const allAcc = Array.from({ length: 21 }, (_, i) => i.toString());
 
-function fillSelect(id, arr, def) {
-    document.getElementById(id).innerHTML = `<option value="">${def}</option>` + arr.map(v => `<option>${v}</option>`).join("");
+function fillSelect(id, arr) {
+    document.getElementById(id).innerHTML = arr.map(v => `<option>${v}</option>`).join("");
 }
-fillSelect("col", allColors, "Couleur");
-fillSelect("gen", allGens, "Génération");
-fillSelect("acc", allAcc, "Acc. restants");
+fillSelect("col", allColors);
+fillSelect("gen", allGens);
 
 let d = [];
 
@@ -110,10 +112,9 @@ document.getElementById("createForm").onsubmit = e => {
     const sexe = document.getElementById("sexe").value;
     const col = document.getElementById("col").value;
     const gen = document.getElementById("gen").value;
-    const acc = document.getElementById("acc").value;
     const nom = document.getElementById("nom").value.trim();
-    if (!sexe || !col || !gen || !acc || !nom.match(/^[a-zA-Z0-9]+$/)) return alert("Champs invalides !");
-    d.push({ id: d.length + 1, sexe, col, gen, acc, nom });
+    if (!sexe || !col || !gen || !nom.match(/^[a-zA-Z0-9]+$/)) return alert("Champs invalides !");
+    d.push({ id: d.length + 1, sexe, col, gen, nom });
     renderList();
     e.target.reset();
 };
