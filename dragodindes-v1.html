@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Dragodingo</title>
+  <style>
+    /* --- Reset & Base --- */
+    * {
+      margin: 0; 
+      padding: 0; 
+      box-sizing: border-box;
+    }
+    html, body {
+      height: 100%;
+    }
+    body {
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      background: url("https://via.placeholder.com/1600x900/222/666?text=Arriere-plan+Dragodingo") no-repeat center center fixed;
+      background-size: cover;
+      color: #ddd;
+      padding: 20px;
+    }
+    .container {
+      background: rgba(51, 51, 51, 0.9); 
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+    }
+
+    /* Titre principal, centré, dégradé */
+    h1#main-title {
+      text-align: center;
+      margin-bottom: 15px;
+      font-size: 2em;
+      font-weight: bold;
+      background: linear-gradient(to right, #3498db, #8e44ad);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+    h2 {
+      margin: 30px 0 10px 0; 
+      font-size: 1.4em; 
+      color: #fff;
+    }
+
+    /* Formulaires */
+    form {
+      display: flex; 
+      flex-wrap: wrap; 
+      align-items: flex-end; 
+      gap: 16px;
+      margin-bottom: 20px; 
+      background: rgba(34,34,34,0.7); 
+      padding: 15px;
+      border-radius: 6px; 
+      border: 1px solid #444;
+    }
+    form .inline {
+      display: flex; 
+      flex-direction: column;
+    }
+    label {
+      font-weight: 600; 
+      margin-bottom: 5px;
+      color: #ddd;
+    }
+    select, input, button {
+      padding: 6px 10px; 
+      font-size: 0.9rem; 
+      border: 1px solid #666; 
+      border-radius: 4px;
+      background: #444;
+      color: #ddd;
+      outline: none;
+    }
+    select:hover, input:hover {
+      background: #555;
+    }
+    button {
+      cursor: pointer; 
+      background: #3498db; 
+      color: #fff; 
+      border: none;
+      transition: background 0.2s, transform 0.2s;
+    }
+    button:hover {
+      background: #2980b9;
+      transform: scale(1.02);
+    }
+    #gn {
+      background: #27ae60; 
+      margin-left: -4px;
+    }
+    #gn:hover {
+      background: #1e8449;
+    }
+
+    /* Table */
+    table {
+      width: 100%; 
+      border-collapse: collapse; 
+      margin-top: 10px; 
+      overflow: hidden;
+      background: rgba(34,34,34,0.6);
+      border-radius: 6px;
+    }
+    thead {
+      background: linear-gradient(to right, #3498db, #8e44ad);
+      color: #fff;
+      cursor: pointer;
+    }
+    th, td {
+      border: 1px solid #555;
+      padding: 10px;
+      font-size: 0.9rem;
+      text-align: left;
+      transition: background 0.2s;
+    }
+    th:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    tr:nth-child(even) td {
+      background: rgba(60,60,60, 0.3);
+    }
+    tr:nth-child(odd) td {
+      background: rgba(60,60,60, 0.15);
+    }
+
+    /* Boutons dans le tableau */
+    .btn-modifier {
+      background: #f1c40f;
+      border-radius: 4px;
+      color: #111;
+    }
+    .btn-modifier:hover {
+      background: #d4ac0d;
+    }
+    .btn-supprimer {
+      background: #e74c3c;
+      border-radius: 4px;
+    }
+    .btn-supprimer:hover {
+      background: #c0392b;
+    }
+
+    /* Bouton "Proposer" */
+    .btn-proposer {
+      background: #8e44ad; 
+      margin-top: 10px;
+    }
+    .btn-proposer:hover {
+      background: #71368a;
+    }
+
+    /* Div actions : ratio 3/1 */
+    .action-buttons {
+      display: flex;
+      gap: 5px;
+      width: 120px;
+    }
+    .btn-modifier {
+      flex: 3;
+    }
+    .btn-supprimer {
+      flex: 1;
+    }
+
+    /* Section croisements */
+    #pairs-text {
+      margin-top: 15px;
+      line-height: 1.5;
+      background: rgba(34,34,34,0.7);
+      border: 1px solid #444;
+      border-radius: 6px;
+      padding: 15px;
+      min-height: 50px;
+      color: #ddd;
+    }
+    .couple-block {
+      margin-bottom: 10px;
+      padding-bottom: 5px;
+      border-bottom: 1px dashed #666;
+    }
+    .couple-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: #fff;
+    }
+    .couple-colors {
+      margin-left: 12px;
+      font-size: 0.9em;
+      color: #bbb;
+    }
+    .couple-valider {
+      margin-left: 12px;
+      background: #2ecc71;
+      padding: 4px 8px;
+      border-radius: 4px;
+      color: #111;
+    }
+    .couple-valider:hover {
+      background: #27ae60;
+    }
+
+    /* Formulaire d'édition (caché par défaut) */
+    #editSection {
+      display: none; 
+      background: rgba(34,34,34,0.8);
+      border: 1px solid #444;
+      border-radius: 6px;
+      padding: 15px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1 id="main-title">Dragodingo</h1>
+
+  <!-- Formulaire de création -->
+  <form id="createForm">
+    <div class="inline">
+      <label>Genre :</label>
+      <select id="sexe">
+        <option value="">(Choisir)</option>
+        <option value="M">Mâle</option>
+        <option value="F">Femelle</option>
+      </select>
+    </div>
+    <div class="inline">
+      <label>Couleur :</label>
+      <select id="col"></select>
+    </div>
+    <div class="inline">
+      <label>Génération :</label>
+      <select id="gen"></select>
+    </div>
+    <div class="inline">
+      <label>Acc. restants :</label>
+      <select id="acc"></select>
+    </div>
+    <div class="inline">
+      <label>Père :</label>
+      <select id="p"></select>
+    </div>
+    <div class="inline">
+      <label>Mère :</label>
+      <select id="m"></select>
+    </div>
+    <div class="inline">
+      <label>Féconde :</label>
+      <select id="fec">
+        <option value="Non" selected>Non</option>
+        <option value="Oui">Oui</option>
+      </select>
+    </div>
+    <div class="inline">
+      <label>Nom :</label>
+      <input type="text" id="nom" placeholder="Nom (lettres/chiffres)" />
+    </div>
+    <button type="button" id="gn">Générer Nom</button>
+    <button type="submit">Créer</button>
+  </form>
+
+  <!-- Formulaire d'édition caché -->
+  <div id="editSection">
+    <h2>Modifier une Dragodinde</h2>
+    <form id="editForm">
+      <!-- Champ caché pour stocker l'ID -->
+      <input type="hidden" id="editId" />
+      <div class="inline">
+        <label>Genre :</label>
+        <select id="editSexe">
+          <option value="">(Choisir)</option>
+          <option value="M">Mâle</option>
+          <option value="F">Femelle</option>
+        </select>
+      </div>
+      <div class="inline">
+        <label>Couleur :</label>
+        <select id="editCol"></select>
+      </div>
+      <div class="inline">
+        <label>Génération :</label>
+        <select id="editGen"></select>
+      </div>
+      <div class="inline">
+        <label>Acc. restants :</label>
+        <select id="editAcc"></select>
+      </div>
+      <div class="inline">
+        <label>Père :</label>
+        <select id="editP"></select>
+      </div>
+      <div class="inline">
+        <label>Mère :</label>
+        <select id="editM"></select>
+      </div>
+      <div class="inline">
+        <label>Féconde :</label>
+        <select id="editFec">
+          <option value="Non">Non</option>
+          <option value="Oui">Oui</option>
+        </select>
+      </div>
+      <div class="inline">
+        <label>Nom :</label>
+        <input type="text" id="editNom" placeholder="Nom (lettres/chiffres)" />
+      </div>
+      <button type="submit">Enregistrer</button>
+      <button type="button" id="cancelEdit">Annuler</button>
+    </form>
+  </div>
+
+  <h2>Liste des Dragodindes</h2>
+  <table id="tableDrago">
+    <thead>
+      <tr>
+        <th data-col="id">ID</th>
+        <th data-col="nom">Nom</th>
+        <th data-col="sexe">Genre</th>
+        <th data-col="col">Couleur</th>
+        <th data-col="gen">Gén.</th>
+        <th data-col="acc" data-type="number">Acc.</th>
+        <th data-col="p" data-type="parent">Père</th>
+        <th data-col="m" data-type="parent">Mère</th>
+        <th data-col="fec">Féconde</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="listBody"></tbody>
+  </table>
+
+  <h2>Propositions de Croisements</h2>
+  <button class="btn-proposer" id="calc-pairs">Proposer des croisements</button>
+  <div id="pairs-text"></div>
+</div>
+
+<script>
+/* -----------------------------------------------------------
+   1) Configuration : Couleurs, G0..G10, Acc(0..20)
+----------------------------------------------------------- */
+const baseColors = [
+  "Amande","Rousse","Doree","Indigo","Orchidee",
+  "Ebene","Pourpre","Emeraude","Ivoire","Turquoise",
+  "Cameleon"
+];
+let allColors = [...baseColors];
+for (let i=0; i<baseColors.length; i++){
+  for (let j=i+1; j<baseColors.length; j++){
+    allColors.push(baseColors[i] + baseColors[j]);
+  }
+}
+let allGens = [];
+for(let i=0;i<=10;i++){
+  allGens.push("G"+i);
+}
+let allAcc=[];
+for(let i=0;i<=20;i++){
+  allAcc.push(i.toString());
+}
+
+/* -----------------------------------------------------------
+   2) Données stockées + ID auto
+----------------------------------------------------------- */
+let d = JSON.parse(localStorage.getItem("dragos")) || [];
+let idc = d.length ? Math.max(...d.map(o=>o.id))+1 : 1;
+
+/* -----------------------------------------------------------
+   3) Fonctions pour remplir <select> + fillParents
+----------------------------------------------------------- */
+function fillSelect(sel, arr, def){
+  sel.innerHTML=`<option value="">${def}</option>`;
+  arr.forEach(v=>{
+    sel.innerHTML+=`<option value="${v}">${v}</option>`;
+  });
+}
+function fillParents(selP, selM){
+  let arr=d.map(o=>({
+    val:o.id,
+    label:`${o.nom} (#${o.id})`
+  }));
+  selP.innerHTML=`<option value="">(Aucun)</option>`;
+  selM.innerHTML=`<option value="">(Aucun)</option>`;
+  arr.forEach(obj=>{
+    selP.innerHTML+=`<option value="${obj.val}">${obj.label}</option>`;
+    selM.innerHTML+=`<option value="${obj.val}">${obj.label}</option>`;
+  });
+}
+
+/* -----------------------------------------------------------
+   4) Création
+----------------------------------------------------------- */
+function updateCreateParents(){
+  fillParents( document.getElementById("p"), document.getElementById("m") );
+}
+document.getElementById("createForm").onsubmit=e=>{
+  e.preventDefault();
+  let sexe=document.getElementById("sexe").value;
+  let col = document.getElementById("col").value;
+  let gen = document.getElementById("gen").value;
+  let acc = document.getElementById("acc").value;
+  let pVal= document.getElementById("p").value;
+  let mVal= document.getElementById("m").value;
+  let fec = document.getElementById("fec").value; // "Oui"/"Non"
+  let nom = document.getElementById("nom").value.trim();
+
+  if(!sexe||!col||!gen||!acc||!nom){
+    alert("Champs obligatoires manquants !");
+    return;
+  }
+  if(!nom.match(/^[a-zA-Z0-9]+$/)){
+    alert("Nom invalide (lettres/chiffres).");
+    return;
+  }
+
+  let obj={
+    id:idc++,
+    sexe:sexe,
+    col:col,
+    gen:gen,
+    acc:parseInt(acc,10),
+    p:pVal? parseInt(pVal,10):null,
+    m:mVal? parseInt(mVal,10):null,
+    fec:fec,
+    nom:nom
+  };
+  d.push(obj);
+  localStorage.setItem("dragos",JSON.stringify(d));
+  renderList();
+  e.target.reset();
+};
+
+// Bouton "Générer Nom" + copie presse-papier
+document.getElementById("gn").onclick=()=>{
+  let cVal=document.getElementById("col").value||"X";
+  let gVal=document.getElementById("gen").value||"G?";
+  let rnd=Math.floor(Math.random()*10000);
+  let init=cVal[0].toUpperCase();
+  let generatedName = init + gVal + rnd;
+  // On met dans l'input
+  document.getElementById("nom").value = generatedName;
+
+  // On copie dans le presse-papier
+  navigator.clipboard.writeText(generatedName)
+    .then(()=>{
+      alert("Nom généré copié dans le presse-papier: " + generatedName);
+    })
+    .catch(err=>{
+      console.error("Impossible de copier", err);
+    });
+};
+
+/* -----------------------------------------------------------
+   5) Ancêtres + consanguinité
+----------------------------------------------------------- */
+function getAncestors(dragodinde, setA=new Set()){
+  if(dragodinde.p){
+    setA.add(dragodinde.p);
+    let father=d.find(x=>x.id===dragodinde.p);
+    if(father) getAncestors(father,setA);
+  }
+  if(dragodinde.m){
+    setA.add(dragodinde.m);
+    let mother=d.find(x=>x.id===dragodinde.m);
+    if(mother) getAncestors(mother,setA);
+  }
+  return setA;
+}
+function isConsang(A,B){
+  let setA=getAncestors(A);
+  let setB=getAncestors(B);
+  for(let x of setA){
+    if(setB.has(x)) return true;
+  }
+  if(setA.has(B.id)||setB.has(A.id)) return true;
+  return false;
+}
+
+/* -----------------------------------------------------------
+   6) Edition via form #editForm
+----------------------------------------------------------- */
+function openEditForm(id){
+  document.getElementById("editSection").style.display="flex";
+
+  // On préremplit les selects
+  fillSelect(document.getElementById("editCol"), allColors, "- Couleur -");
+  fillSelect(document.getElementById("editGen"), allGens, "- Génération -");
+  fillSelect(document.getElementById("editAcc"), allAcc, "- Acc. restants -");
+  fillParents(document.getElementById("editP"), document.getElementById("editM"));
+
+  let obj=d.find(o=>o.id===id);
+  if(!obj) return;
+
+  document.getElementById("editId").value = obj.id;
+  document.getElementById("editSexe").value= obj.sexe;
+  document.getElementById("editCol").value = obj.col;
+  document.getElementById("editGen").value = obj.gen;
+  document.getElementById("editAcc").value = obj.acc;
+  document.getElementById("editP").value   = obj.p || "";
+  document.getElementById("editM").value   = obj.m || "";
+  document.getElementById("editFec").value = obj.fec || "Non";
+  document.getElementById("editNom").value = obj.nom;
+}
+function closeEditForm(){
+  document.getElementById("editSection").style.display="none";
+}
+
+document.getElementById("editForm").onsubmit = e=>{
+  e.preventDefault();
+  let theId = parseInt(document.getElementById("editId").value,10);
+  let obj = d.find(x=>x.id===theId);
+  if(!obj) return;
+
+  let esex = document.getElementById("editSexe").value;
+  let ecol = document.getElementById("editCol").value;
+  let egen = document.getElementById("editGen").value;
+  let eacc = document.getElementById("editAcc").value;
+  let ep   = document.getElementById("editP").value;
+  let em   = document.getElementById("editM").value;
+  let efec = document.getElementById("editFec").value;
+  let enom = document.getElementById("editNom").value.trim();
+
+  if(!esex||!ecol||!egen||!eacc||!enom){
+    alert("Champs obligatoires manquants !");
+    return;
+  }
+  if(!enom.match(/^[a-zA-Z0-9]+$/)){
+    alert("Nom invalide (lettres/chiffres).");
+    return;
+  }
+
+  obj.sexe = esex;
+  obj.col  = ecol;
+  obj.gen  = egen;
+  obj.acc  = parseInt(eacc,10);
+  obj.p    = ep? parseInt(ep,10):null;
+  obj.m    = em? parseInt(em,10):null;
+  obj.fec  = efec;
+  obj.nom  = enom;
+
+  localStorage.setItem("dragos", JSON.stringify(d));
+  closeEditForm();
+  renderList();
+  renderPairs();
+};
+document.getElementById("cancelEdit").onclick=()=>{
+  closeEditForm();
+};
+
+/* -----------------------------------------------------------
+   7) Rendu de la liste + tri
+----------------------------------------------------------- */
+let currentSortCol=null;
+let currentSortDir=1; // 1 => asc, -1 => desc
+
+function renderList(){
+  updateCreateParents();
+  let tb=document.getElementById("listBody");
+  tb.innerHTML="";
+  d.forEach(o=>{
+    let tr=document.createElement("tr");
+    // ID
+    let tdId=document.createElement("td");
+    tdId.textContent=o.id; tr.appendChild(tdId);
+    // Nom
+    let tdNom=document.createElement("td");
+    tdNom.textContent=o.nom; tr.appendChild(tdNom);
+    // Genre
+    let tdSex=document.createElement("td");
+    tdSex.textContent=(o.sexe==="M")?"Mâle":"Femelle"; tr.appendChild(tdSex);
+    // Couleur
+    let tdCol=document.createElement("td");
+    tdCol.textContent=o.col; tr.appendChild(tdCol);
+    // Gén
+    let tdGen=document.createElement("td");
+    tdGen.textContent=o.gen; tr.appendChild(tdGen);
+    // Acc
+    let tdAcc=document.createElement("td");
+    tdAcc.textContent=o.acc; tr.appendChild(tdAcc);
+    // Père
+    let tdP=document.createElement("td");
+    if(o.p){
+      let father=d.find(x=>x.id===o.p);
+      if(father) tdP.textContent=`${father.nom} (#${father.id})`;
+      else tdP.textContent=`Inconnu (#${o.p})`;
+    } else tdP.textContent="Aucun";
+    tr.appendChild(tdP);
+    // Mère
+    let tdM=document.createElement("td");
+    if(o.m){
+      let mother=d.find(x=>x.id===o.m);
+      if(mother) tdM.textContent=`${mother.nom} (#${mother.id})`;
+      else tdM.textContent=`Inconnue (#${o.m})`;
+    } else tdM.textContent="Aucune";
+    tr.appendChild(tdM);
+    // Féconde
+    let tdFec=document.createElement("td");
+    tdFec.textContent=o.fec||"Non";
+    tr.appendChild(tdFec);
+    // Actions
+    let tdAct=document.createElement("td");
+    tdAct.className="action-buttons";
+    let btnMod=document.createElement("button");
+    btnMod.className="btn-modifier";
+    btnMod.style.flex="3";
+    btnMod.textContent="Modifier";
+    btnMod.onclick=()=>openEditForm(o.id);
+    let btnSup=document.createElement("button");
+    btnSup.className="btn-supprimer";
+    btnSup.style.flex="1";
+    btnSup.textContent="X";
+    btnSup.onclick=()=>{
+      d=d.filter(xx=>xx.id!==o.id);
+      localStorage.setItem("dragos",JSON.stringify(d));
+      renderList();
+      renderPairs();
+    };
+    tdAct.appendChild(btnMod);
+    tdAct.appendChild(btnSup);
+    tr.appendChild(tdAct);
+    tb.appendChild(tr);
+  });
+}
+
+function sortDragos(col, dir, type){
+  d.sort((a,b)=>{
+    let va=a[col], vb=b[col];
+    if(type==="number"){
+      va=parseInt(va,10)||0;
+      vb=parseInt(vb,10)||0;
+    } else if(type==="parent"){
+      // tri par nom du parent
+      let fatherA=d.find(x=>x.id===va);
+      va=fatherA? fatherA.nom.toLowerCase():"";
+      let fatherB=d.find(x=>x.id===vb);
+      vb=fatherB? fatherB.nom.toLowerCase():"";
+    } else {
+      va=(va||"").toString().toLowerCase();
+      vb=(vb||"").toString().toLowerCase();
+    }
+    if(va<vb) return -1*dir;
+    if(va>vb) return 1*dir;
+    return 0;
+  });
+}
+
+document.querySelectorAll("#tableDrago thead th").forEach(th=>{
+  if(!th.dataset.col) return;
+  th.addEventListener("click", ()=>{
+    let col=th.dataset.col;
+    let type=th.dataset.type||"string";
+    if(currentSortCol===col){
+      currentSortDir*=-1;
+    } else {
+      currentSortCol=col;
+      currentSortDir=1;
+    }
+    sortDragos(col, currentSortDir, type);
+    renderList();
+  });
+});
+
+/* -----------------------------------------------------------
+   8) Croisements
+----------------------------------------------------------- */
+function isConsang(A,B){
+  let setA=getAncestors(A), setB=getAncestors(B);
+  for(let x of setA){
+    if(setB.has(x)) return true;
+  }
+  if(setA.has(B.id)||setB.has(A.id)) return true;
+  return false;
+}
+function getAncestors(dragodinde, setA=new Set()){
+  if(dragodinde.p){
+    setA.add(dragodinde.p);
+    let father=d.find(x=>x.id===dragodinde.p);
+    if(father) getAncestors(father,setA);
+  }
+  if(dragodinde.m){
+    setA.add(dragodinde.m);
+    let mother=d.find(x=>x.id===dragodinde.m);
+    if(mother) getAncestors(mother,setA);
+  }
+  return setA;
+}
+
+function calcPairs(){
+  let pairs=[];
+  for(let i=0;i<d.length;i++){
+    for(let j=i+1;j<d.length;j++){
+      let A=d[i], B=d[j];
+      if(A.sexe===B.sexe) continue;
+      if(A.acc<1||B.acc<1) continue;
+      if(A.fec!=="Oui"||B.fec!=="Oui") continue;
+      if(isConsang(A,B)) continue;
+      let genA = parseInt(A.gen.replace("G",""),10)||0;
+      let genB = parseInt(B.gen.replace("G",""),10)||0;
+      let diff = Math.abs(genA-genB);
+      let sumAcc = A.acc+B.acc;
+      pairs.push({A,B,diff,sumAcc});
+    }
+  }
+  // tri diff asc, sumAcc desc
+  pairs.sort((p1,p2)=>{
+    if(p1.diff!==p2.diff) return p1.diff - p2.diff;
+    return p2.sumAcc - p1.sumAcc;
+  });
+  return pairs;
+}
+function possibleChildColors(cA,cB){
+  let s=new Set([cA,cB]);
+  if(cA!==cB){
+    s.add(cA+cB);
+    s.add(cB+cA);
+  }
+  return Array.from(s);
+}
+function doAccouplement(dadId,momId){
+  let dad=d.find(x=>x.id===dadId);
+  let mom=d.find(x=>x.id===momId);
+  if(!dad||!mom) return;
+  dad.acc=Math.max(0,dad.acc-1);
+  mom.acc=Math.max(0,mom.acc-1);
+  dad.fec="Non";
+  mom.fec="Non";
+  localStorage.setItem("dragos",JSON.stringify(d));
+  renderList();
+  renderPairs();
+}
+function renderPairs(){
+  let pairs=calcPairs();
+  let pairsDiv=document.getElementById("pairs-text");
+  if(!pairs.length){
+    pairsDiv.innerHTML="<p>Aucun croisement possible (acc, fécondité ou consanguinité bloquent).</p>";
+    return;
+  }
+  let out=`<p>Nous avons trouvé <strong>${pairs.length}</strong> couples potentiels :</p><br/>`;
+  pairs.forEach((p, idx)=>{
+    let colors=possibleChildColors(p.A.col,p.B.col).join(" / ");
+    out+=`
+      <div class="couple-block">
+        <div class="couple-title">${idx+1}) ${p.A.nom} (${p.A.col}, G=${p.A.gen}, acc=${p.A.acc})
+         × ${p.B.nom} (${p.B.col}, G=${p.B.gen}, acc=${p.B.acc})
+         <br/><small>diffGen=${p.diff}, sumAcc=${p.sumAcc}</small>
+        </div>
+        <div class="couple-colors">Couleurs potentielles : ${colors}</div>
+        <button class="couple-valider" data-dad="${p.A.id}" data-mom="${p.B.id}">
+          Valider l'accouplement
+        </button>
+      </div>
+    `;
+  });
+  pairsDiv.innerHTML=out;
+  document.querySelectorAll(".couple-valider").forEach(btn=>{
+    btn.addEventListener("click", e=>{
+      let dadId=parseInt(btn.dataset.dad,10);
+      let momId=parseInt(btn.dataset.mom,10);
+      doAccouplement(dadId,momId);
+    });
+  });
+}
+
+/* -----------------------------------------------------------
+   9) Initialisation
+----------------------------------------------------------- */
+function init(){
+  fillSelect(document.getElementById("col"), allColors, "- Couleur -");
+  fillSelect(document.getElementById("gen"), allGens, "- Génération -");
+  fillSelect(document.getElementById("acc"), allAcc, "- Acc. restants -");
+  renderList();
+}
+document.getElementById("calc-pairs").onclick=renderPairs;
+init();
+</script>
+
+</body>
+</html>
