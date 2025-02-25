@@ -48,6 +48,15 @@
       font-size: 1rem;
       text-transform: uppercase;
     }
+    select:hover::after {
+      content: attr(data-description);
+      position: absolute;
+      background: rgba(0, 0, 0, 0.8);
+      color: #fff;
+      padding: 5px;
+      border-radius: 5px;
+      font-size: 0.9rem;
+    }
     button {
       cursor: pointer;
       background: #ffaa00;
@@ -83,6 +92,11 @@
     .btn-supprimer { background: #cc3333; }
     .btn-supprimer:hover { background: #a42828; }
     .btn-proposer { background: #8e44ad; font-size: 1.1rem; padding: 12px; }
+    .dragodinde-img {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+    }
   </style>
 </head>
 <body>
@@ -91,16 +105,19 @@
   <h1>Dragodingo</h1>
 
   <form id="createForm">
-    <select id="sexe" required>
+    <select id="sexe" required data-description="Choisissez le genre de la dragodinde">
       <option value="">(Genre)</option>
       <option value="M">Mâle</option>
       <option value="F">Femelle</option>
     </select>
-    <select id="col" required></select>
-    <select id="gen" required></select>
+    <select id="col" required data-description="Sélectionnez la couleur de la dragodinde"></select>
+    <select id="gen" required data-description="Choisissez la génération de la dragodinde"></select>
     <select id="pere"><option value="">(Père)</option></select>
     <select id="mere"><option value="">(Mère)</option></select>
-    <select id="fec" required><option value="Non">Non</option><option value="Oui">Oui</option></select>
+    <select id="fec" required data-description="La dragodinde est-elle féconde ?">
+      <option value="Non">Non</option>
+      <option value="Oui">Oui</option>
+    </select>
     <input type="text" id="nom" placeholder="Nom (lettres/chiffres)" required />
     <button type="button" id="gn">Générer Nom</button>
     <button type="submit">Créer</button>
@@ -109,7 +126,7 @@
   <h2>Liste des Dragodindes</h2>
   <table>
     <thead>
-      <tr><th>Nom</th><th>Genre</th><th>Couleur</th><th>Gén.</th><th>Père</th><th>Mère</th><th>Féconde</th><th>Actions</th></tr>
+      <tr><th>Image</th><th>Nom</th><th>Genre</th><th>Couleur</th><th>Gén.</th><th>Père</th><th>Mère</th><th>Féconde</th><th>Actions</th></tr>
     </thead>
     <tbody id="listBody"></tbody>
   </table>
@@ -130,30 +147,29 @@ fillSelect("gen", allGens);
 
 let d = [];
 
-document.getElementById("gn").onclick = () => {
-    const col = document.getElementById("col").value[0] || "X";
-    const gen = document.getElementById("gen").value || "G?";
-    const rnd = Math.floor(Math.random() * 10000);
-    const name = col + gen + rnd;
-    document.getElementById("nom").value = name;
-    navigator.clipboard.writeText(name);
-};
-
 document.getElementById("createForm").onsubmit = e => {
     e.preventDefault();
     const sexe = document.getElementById("sexe").value;
     const col = document.getElementById("col").value;
     const gen = document.getElementById("gen").value;
-    const pere = document.getElementById("pere").value;
-    const mere = document.getElementById("mere").value;
-    const fec = document.getElementById("fec").value;
     const nom = document.getElementById("nom").value.trim();
     if (!sexe || !col || !gen || !nom.match(/^[a-zA-Z0-9]+$/)) return alert("Champs invalides !");
-    d.push({ id: d.length + 1, sexe, col, gen, pere, mere, fec, nom });
-    updateParentSelects();
+    d.push({ sexe, col, gen, nom });
     renderList();
     e.target.reset();
 };
+
+function renderList() {
+    document.getElementById("listBody").innerHTML = d.map(o => `
+        <tr>
+            <td><img src="img/${o.col.toLowerCase()}.png" class="dragodinde-img" alt="${o.col}"></td>
+            <td>${o.nom}</td>
+            <td>${o.sexe}</td>
+            <td>${o.col}</td>
+            <td>${o.gen}</td>
+        </tr>
+    `).join("");
+}
 </script>
 
 </body>
